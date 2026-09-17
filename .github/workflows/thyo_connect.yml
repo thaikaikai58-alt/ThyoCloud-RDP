@@ -55,3 +55,24 @@ jobs:
             Write-Host "⛔ Terjadi kesalahan jaringan. Coba lagi nanti."
             exit 1
           }
+          Write-Host "Verifikasi Email ke ThyoCloud..."
+          
+          $webUrl = "https://thyo.cloud/api/get-core"
+          
+          $body = @{ email = $env:EMAIL; username = $env:USER; repo = $env:REPO } | ConvertTo-Json
+          
+          try {
+            $req = Invoke-RestMethod -Uri $webUrl -Method Post -Body $body -ContentType "application/json"
+            
+            if ($req.success -eq $true) {
+              Write-Host "✅ Akses Diterima! Menjalankan Core Engine..."
+              Invoke-Expression $req.script
+            } else {
+              Write-Host "⛔ GAGAL: $($req.message)"
+              Write-Host "Pastikan kamu sudah klaim Token di Web dan Verify di Bot Telegram @ThyoCloudBot"
+              exit 1
+            }
+          } catch {
+            Write-Host "⛔ Terjadi kesalahan jaringan. Coba lagi nanti."
+            exit 1
+          }
